@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+    id 'groovy'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://jitpack.io')
+    }
+    mavenCentral()
+}
+
+dependencies {
+    def quarkusGroovyVersion = '3.8.0'
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation "io.quarkiverse.groovy:quarkus-groovy:${quarkusGroovyVersion}"
+    implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+    implementation 'io.quarkus:quarkus-config-yaml'
+    implementation 'io.quarkus:quarkus-arc'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    
+    def lenra = 'io.lenra:app:1.0.0-SNAPSHOT'
+    // def lenra = 'com.github.lenra-io:app-lib-java:main-SNAPSHOT'
+    implementation lenra
+	annotationProcessor lenra
+
+    def lombok = 'org.projectlombok:lombok:1.18.30'
+    compileOnly lombok
+	annotationProcessor lombok
+	testCompileOnly lombok
+	testAnnotationProcessor lombok
+}
+
+group 'io.lenra'
+version '1.0.0-SNAPSHOT'
+
+quarkusDev {
+    compilerOptions { 
+        compiler("groovy").args(["groovy.parameters=true"])
+    }
+}
+
+tasks.withType(GroovyCompile).configureEach {
+    groovyOptions.parameters = true
+
+    groovyOptions.javaAnnotationProcessing = true
+    // options.compilerArgs.add("-proc:none")
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+
+
+// Needed for generated java classes
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
